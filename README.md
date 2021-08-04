@@ -19,7 +19,9 @@ without it.
 For Chomp to work, your Git *must* have the `lp:` shortcut configured globally
 ([learn how here](https://help.launchpad.net/Code/Git#Configuring_Git)).
 
-Place the `chomp` file in your environment path, e.g. in `~/.local/bin`.
+Copy or symlink the `chomp` file intp your environment path,
+e.g. in `~/.local/bin`. I particularly recommend cloning the repository,
+and then symlinking `chomp` into `~/.local/bin` via `ln -s`.
 
 By default, Chomp will check out repositories in the directory `~/.chomp`, but
 you can override this by setting the environment variable `CHOMP_PATH`.
