@@ -1,0 +1,156 @@
+#!/bin/bash
+# Clones Launchpad repositories for code review.
+
+CHOMP_WORKING_DIR=${CHOMP_PATH:=~/.chomp}
+mkdir -p $CHOMP_WORKING_DIR
+
+EDITOR=${CHOMP_EDITOR:="code -n %P"}
+
+
+function parse {
+    IFS=":" read -ra split <<< $TARGET
+    CLONE=${split[0]}
+    BRANCH=${split[1]}
+
+    IFS="/" read -ra split <<< $CLONE
+    USER=${split[0]:1}  # user, without tilde
+    GROUP=${split[1]}
+    REPO=${split[-1]}
+
+    DEST="${USER}_${GROUP}_${REPO}"
+    FULL_PATH="${CHOMP_WORKING_DIR}/${DEST}"
+}
+
+function clone {
+    if [ -z $BRANCH ]; then
+        cd $CHOMP_WORKING_DIR
+        git clone lp:$CLONE $DEST
+    else
+        cd $CHOMP_WORKING_DIR
+        git clone -b $BRANCH lp:$CLONE $DEST
+    fi
+
+    if [ ! -d "${FULL_PATH}" ]; then
+        echo "Could not clone repository ${CLONE}"
+        exit 1
+    fi
+}
+
+function tryclone {
+    if [ -d "${FULL_PATH}" ]; then
+        while true; do
+            read -p "Repository already cloned. Switch branch (S), reclone (R), or cancel (C)?" opt
+            case $opt in
+                [sS]* )
+                    cd $FULL_PATH
+                    git fetch
+                    git checkout $BRANCH
+                    git pull
+                    break
+                    ;;
+                [rR]* )
+                    remove
+                    clone
+                    break
+                    ;;
+                [cC]* )
+                    echo "Aborting."
+                    exit 1
+                    ;;
+            esac
+        done
+    else
+        clone
+    fi
+}
+
+function remove {
+    if [ ! -d "${FULL_PATH}" ]; then
+        echo "${CLONE} is not checked out."
+        exit 1
+    fi
+    cd ${CHOMP_WORKING_DIR}
+    rm -rf ${DEST}
+}
+
+function edit {
+    if [ ! -d "${FULL_PATH}" ]; then
+        echo "Repository not cloned. See 'clone' command."
+        exit 1
+    fi
+
+    cd $FULL_PATH
+
+    CURRENT_BRANCH=$(git branch --show-current)
+    if [ "$BRANCH" != "$CURRENT_BRANCH" ]; then
+        echo "Changing branch"
+        git checkout $BRANCH
+    fi
+
+    while true; do
+        read -p "Open in editor now? [Y/n]" yn
+        case $yn in
+            [Nn]* )
+                echo "Repository cloned to ${FULL_PATH}"
+                exit 0
+                ;;
+            * )
+                ${EDITOR/'%P'/$FULL_PATH}
+                exit 0
+                ;;
+        esac
+    done
+}
+
+function help {
+    echo "Clones a Launchpad Git branch for code review."
+    echo ""
+    echo "Usage: chomp [command] <launchpad_branch>"
+    echo "Commands:"
+    echo "    clone (default): clone the launchpad branch (pulls from remote)"
+    echo "    edit: edit the launchpad branch (NEVER pulls from remote)"
+    echo "    remove: remove the launchpad branch"
+    echo "    help: view this screen"
+    echo ""
+    echo "<launchpad_branch> should be in one of these forms:"
+    echo "    ~user/group/+git/repo"
+    echo "    ~user/group/+git/repo:branch"
+    echo ""
+    echo "Environment Variables:"
+    echo "    CHOMP_PATH: the path to the directory where chomp will clone repo"
+    echo "        Default: '~/.chomp'"
+    echo "    CHOMP_EDITOR: the command chomp uses to open the repo in editor"
+    echo "        Default: 'code -n '"
+}
+
+COMMAND=$1
+TARGET=$2
+
+case "$COMMAND" in
+    ("clone")
+        parse
+        tryclone
+        edit
+        ;;
+    ("remove")
+        parse
+        remove
+        ;;
+    ("edit")
+        parse
+        edit
+        ;;
+    ("help"|"--help")
+        help
+        ;;
+    ~*)
+        TARGET=$COMMAND
+        parse
+        tryclone
+        edit
+        ;;
+    *)
+        echo "Unknown command '$COMMAND'. See 'help'"
+        exit 1
+        ;;
+esac
