@@ -45,7 +45,7 @@ chomp ~codemouse92/cloudware/+git/cpc_docs:fixtypos
 ```
 
 It will clone the repository in Chomp's working directory with the name
-`user_group_repo` (e.g. `codemouse92_cloudware_cpc_docs`), and check out the
+`user.group.repo` (e.g. `codemouse92.cloudware.cpc_docs`), and check out the
 appropriate branch (if one was specified). Then it will ask if you want to
 open the repository directory in your editor (and you only need to
 hit enter!)

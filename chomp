@@ -6,7 +6,6 @@ mkdir -p $CHOMP_WORKING_DIR
 
 EDITOR=${CHOMP_EDITOR:="code -n %P"}
 
-
 function parse {
     IFS=":" read -ra split <<< $TARGET
     CLONE=${split[0]}
@@ -17,7 +16,7 @@ function parse {
     GROUP=${split[1]}
     REPO=${split[-1]}
 
-    DEST="${USER}_${GROUP}_${REPO}"
+    DEST="${USER}.${GROUP}.${REPO}"
     FULL_PATH="${CHOMP_WORKING_DIR}/${DEST}"
 }
 
@@ -82,8 +81,10 @@ function edit {
     cd $FULL_PATH
 
     CURRENT_BRANCH=$(git branch --show-current)
-    if [ "$BRANCH" != "$CURRENT_BRANCH" ]; then
-        echo "Changing branch"
+    if [ -z $BRANCH ]; then
+        echo "No branch specified. Editing on current branch ${CURRENT_BRANCH}"
+    elif [ "$BRANCH" != "$CURRENT_BRANCH" ]; then
+        echo "Switching to branch ${BRANCH}"
         git checkout $BRANCH
     fi
 
@@ -102,6 +103,17 @@ function edit {
     done
 }
 
+function list {
+    cd $CHOMP_WORKING_DIR
+    for f in *; do
+        IFS="." read -ra split <<< ${f}
+        LUSER=${split[0]}
+        LGROUP=${split[1]}
+        LREPO=${split[2]}
+        echo "~${LUSER}/${LGROUP}/+git/${LREPO}"
+    done
+}
+
 function help {
     echo "Clones a Launchpad Git branch for code review."
     echo ""
@@ -109,6 +121,7 @@ function help {
     echo "Commands:"
     echo "    clone (default): clone the launchpad branch (pulls from remote)"
     echo "    edit: edit the launchpad branch (NEVER pulls from remote)"
+    echo "    list: list repositories currently checked out by chomp"
     echo "    remove: remove the launchpad branch"
     echo "    help: view this screen"
     echo ""
@@ -142,6 +155,9 @@ case "$COMMAND" in
         ;;
     ("help"|"--help")
         help
+        ;;
+    ("list")
+        list
         ;;
     ~*)
         TARGET=$COMMAND
