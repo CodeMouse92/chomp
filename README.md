@@ -66,6 +66,9 @@ chomp edit ~codemouse92/cloudware/+git/cpc_docs:fixtypos
 That will also handle switching to the correct local branch. (Edit never pulls
 from remote.)
 
+To see all the repositories (not the branches, though) you have cloned with
+Chomp, run `chomp list`.
+
 Finally, when you're done with the repository and want it off your system,
 just run `chomp remove`:
 
