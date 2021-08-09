@@ -72,6 +72,23 @@ function remove {
     rm -rf ${DEST}
 }
 
+function clear {
+    if [ -z "$(ls -A ${CHOMP_WORKING_DIR})" ]; then
+        echo "No repositories checked out to chomp."
+        return 0
+    fi
+
+    read -p "Clear ALL repositories in chomp? (Cannot be reversed!) [y/N]" yn
+    case $yn in
+        [Yy]* )
+            rm -rf ${CHOMP_WORKING_DIR}/*
+            ;;
+        * )
+            echo "Nothing cleared. Everything is safe."
+            ;;
+    esac
+}
+
 function edit {
     if [ ! -d "${FULL_PATH}" ]; then
         echo "Repository not cloned. See 'clone' command."
@@ -105,6 +122,12 @@ function edit {
 
 function list {
     cd $CHOMP_WORKING_DIR
+
+    if [ -z "$(ls -A ${CHOMP_WORKING_DIR})" ]; then
+        echo "No repositories checked out to chomp."
+        return 0
+    fi
+
     for f in *; do
         IFS="." read -ra split <<< ${f}
         LUSER=${split[0]}
@@ -148,6 +171,9 @@ case "$COMMAND" in
     ("remove")
         parse
         remove
+        ;;
+    ("clear")
+        clear
         ;;
     ("edit")
         parse
