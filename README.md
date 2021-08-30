@@ -37,19 +37,19 @@ To use Chomp, you only need the Launchpad repository and branch as it
 appears on the top of the Merge Request. It will always take the form
 `~user/group/+git/repo` or `~user/group/+git/repo:branch`.
 
-For example: `~codemouse92/cloudware/+git/cpc_docs:fixtypos`
+For example: `~codemouse92/livecd-rootfs/+git/livecd-rootfs:hyperv-manifest`
 
 That line must *always* start with a tilde for Chomp to recognize it.
 To clone that repository and branch, simply run:
 
 ```
-chomp ~codemouse92/cloudware/+git/cpc_docs:fixtypos
+chomp ~codemouse92/livecd-rootfs/+git/livecd-rootfs:hyperv-manifest
 ```
 
 It will clone the repository in Chomp's working directory with the name
-`user.group.repo` (e.g. `codemouse92.cloudware.cpc_docs`), and check out the
-appropriate branch (if one was specified). Then it will ask if you want to
-open the repository directory in your editor (and you only need to
+`user.group.repo` (e.g. `codemouse92.livecd-rootfs.livecd-rootfs`), and check out the
+appropriate branch (if one was specified, e.g. `hyperv-manifest` here). Then it will
+ask if you want to open the repository directory in your editor (and you only need to
 hit enter!)
 
 Not sure if you've cloned this before? Not to worry. If Chomp finds the same
@@ -60,7 +60,7 @@ If you just want to edit a repository you've already checked out, run
 `chomp edit`, like this:
 
 ```
-chomp edit ~codemouse92/cloudware/+git/cpc_docs:fixtypos
+chomp edit ~codemouse92/livecd-rootfs/+git/livecd-rootfs:hyperv-manifest
 ```
 
 That will also handle switching to the correct local branch. (Edit never pulls
@@ -73,7 +73,7 @@ Finally, when you're done with the repository and want it off your system,
 just run `chomp remove`:
 
 ```
-chomp remove ~codemouse92/cloudware/+git/cpc_docs:fixtypos
+chomp remove ~codemouse92/livecd-rootfs/+git/livecd-rootfs:hyperv-manifest
 ```
 
 Easy as pie.
